@@ -11,10 +11,13 @@ namespace linq
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Enter full file path:");
+            Console.Write("Enter full file path: ");
             string path = Console.ReadLine();
 
-            List<Product> list = new List<Product>();
+            Console.Write("Enter salary: ");
+            double salary = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+            List<Employee> list = new List<Employee>();
 
             using (StreamReader sr = File.OpenText(path))
             {
@@ -22,19 +25,22 @@ namespace linq
                 {
                     string[] fields = sr.ReadLine().Split(",");
                     string name = fields[0];
-                    double price = double.Parse(fields[1], CultureInfo.InvariantCulture);
-                    list.Add(new Product(name, price));
+                    string email = fields[1];
+                    double price = double.Parse(fields[2], CultureInfo.InvariantCulture);
+                    list.Add(new Employee(name, email, price));
                 }
             }
 
-            var avg = list.Select(p => p.Price).DefaultIfEmpty().Average();
-            Console.WriteLine("Average price = " + avg.ToString("F2", CultureInfo.InvariantCulture));
-
-            var names = list.Where(p => p.Price < avg).OrderByDescending(p => p.Name).Select(p => p.Name);
-            foreach (string name in names)
+            var moreThanReference = list.Where(p => p.Salary > salary).OrderBy(p => p.Name).Select(p => p.Email);
+            Console.WriteLine("Email of people whose salary is more than " + salary.ToString("F2", CultureInfo.InvariantCulture));
+            foreach (string personEmail in moreThanReference)
             {
-                Console.WriteLine(name);
+                Console.WriteLine(personEmail);
             }
+
+            var salarySum = list.Where(obj => obj.Name[0] == 'M').Sum(obj => obj.Salary);
+
+            Console.WriteLine("Sum of salary of people whose name starts with 'M': " + salarySum.ToString("F2", CultureInfo.InvariantCulture));
         }
     }
 }
